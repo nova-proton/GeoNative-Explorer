@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoNative Explorer</title>
+
+    <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="logo">G</div>
+        <div class="brand-text">
+            <h1>GeoNative</h1>
+            <span>EXPLORER</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <div class="platform-status">
+            <span class="status-dot"></span>
+            <span data-i18n="platform">Web GIS Platform</span>
+        </div>
+
+        <div class="language-selector">
+            <button id="langEN" class="lang-btn active">EN</button>
+            <span>|</span>
+            <button id="langTR" class="lang-btn">TR</button>
+        </div>
+    </div>
+</header>
+
+
+<main class="workspace">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="panel-title" data-i18n="tools">MAP TOOLS</div>
+
+        <div class="tool active">
+            <span class="tool-icon">⌖</span>
+            <div>
+                <strong data-i18n="explorer">Map Explorer</strong>
+                <small data-i18n="explorerDesc">Navigate the map</small>
+            </div>
+        </div>
+
+        
+        <button id="locationTool" class="tool tool-button">
+            <span class="tool-icon">📍</span>
+            <div>
+                <strong data-i18n="location">Location Info</strong>
+                <small data-i18n="locationDesc">View coordinates</small>
+            </div>
+        </button>
+
+        <div id="locationPanel" class="measurement-panel" hidden>
+            <div class="measurement-title" data-i18n="locationTitle">
+                LOCATION INFORMATION
+            </div>
+
+            <div class="measurement-result">
+                <span data-i18n="latitude">Latitude</span>
+                <strong id="infoLatitude">--</strong>
+            </div>
+
+            <div class="measurement-result">
+                <span data-i18n="longitude">Longitude</span>
+                <strong id="infoLongitude">--</strong>
+            </div>
+
+            <div class="measurement-result">
+                <span data-i18n="dmsCoordinates">DMS Coordinates</span>
+                <strong id="infoDMS">--</strong>
+            </div>
+
+            <button id="copyCoordinates" class="drawing-action"
+                data-i18n="copyCoordinates">
+                Copy Coordinates
+            </button>
+        </div>
+
+
+        <!-- MEASUREMENT TOOL -->
+        <button id="measurementTool" class="tool tool-button">
+            <span class="tool-icon">📏</span>
+            <div>
+                <strong data-i18n="measurement">Measurement</strong>
+                <small data-i18n="measurementDesc">Distance and area</small>
+            </div>
+        </button>
+
+        <!-- MEASUREMENT PANEL -->
+        <div id="measurementPanel" class="measurement-panel" hidden>
+
+            <div class="measurement-title" data-i18n="measureTitle">
+                MEASUREMENT TOOLS
+            </div>
+
+            <button id="distanceMode" class="measure-mode">
+                📏 <span data-i18n="distanceMode">Measure Distance</span>
+            </button>
+
+            <button id="areaMode" class="measure-mode">
+                ◇ <span data-i18n="areaMode">Measure Area</span>
+            </button>
+
+            <div id="measurementStatus" class="measurement-status"
+                data-i18n="measureInstruction">
+                Select a measurement mode.
+            </div>
+
+            <div class="measurement-result">
+                <span data-i18n="measurementResult">Result</span>
+                <strong id="measurementValue">--</strong>
+            </div>
+
+            <div class="measurement-actions">
+                <button id="finishMeasurement" data-i18n="finish">
+                    Finish
+                </button>
+
+                <button id="clearMeasurement" data-i18n="clear">
+                    Clear
+                </button>
+            </div>
+
+        </div>
+
+                
+        <button id="drawingTool" class="tool tool-button">
+            <span class="tool-icon">✏️</span>
+            <div>
+                <strong data-i18n="drawing">Drawing Tools</strong>
+                <small data-i18n="drawingDesc">Draw on the map</small>
+            </div>
+        </button>
+
+        <div id="drawingPanel" class="measurement-panel" hidden>
+
+            <div class="measurement-title" data-i18n="drawingTitle">
+                DRAWING TOOLS
+            </div>
+
+            <button id="drawPoint" class="measure-mode">
+                📍 <span data-i18n="drawPoint">Draw Points</span>
+            </button>
+
+            <button id="drawLine" class="measure-mode">
+                📏 <span data-i18n="drawLine">Draw Line</span>
+            </button>
+
+            <button id="drawPolygon" class="measure-mode">
+                ◇ <span data-i18n="drawPolygon">Draw Polygon</span>
+            </button>
+
+            <div id="drawingStatus" class="measurement-status"
+                data-i18n="drawingInstruction">
+                Select a drawing mode.
+            </div>
+
+            <div class="measurement-actions">
+                <button id="undoDrawing" data-i18n="undo">Undo</button>
+                <button id="finishDrawing" data-i18n="finish">Finish</button>
+            </div>
+
+            <button id="clearDrawing" class="drawing-action"
+                data-i18n="clear">
+                Clear
+            </button>
+
+            <button id="exportDrawing" class="drawing-action"
+                data-i18n="exportGeoJSON">
+                Export GeoJSON
+            </button>
+
+            <button id="importGeoJSON" class="drawing-action"
+                data-i18n="importGeoJSON">
+                Import GeoJSON
+            </button>
+
+            <input
+                type="file"
+                id="geoJSONFile"
+                accept=".geojson,.json,application/geo+json,application/json"
+                hidden
+            >
+
+        </div>
+
+
+        <div class="divider"></div>
+
+        <div class="panel-title" data-i18n="layers">MAP LAYERS</div>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="street" checked>
+            <span>Street Map</span>
+        </label>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="satellite">
+            <span>Satellite Imagery</span>
+        </label>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="topographic">
+            <span>Topographic Map</span>
+        </label>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="esriStreet">
+            <span>Esri Street</span>
+        </label>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="esriTopo">
+            <span>Esri Topographic</span>
+        </label>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="esriTerrain">
+            <span>Esri Terrain</span>
+        </label>
+
+        <label class="layer-option">
+            <input type="radio" name="mapLayer" value="esriNatGeo">
+            <span>Esri National Geographic</span>
+        </label>
+
+        <div class="divider"></div>
+
+        <div class="panel-title" data-i18n="project">PROJECT INFORMATION</div>
+
+        <div class="project-info">
+            <span data-i18n="projectNameLabel">Project</span>
+            <strong>GeoNative Explorer</strong>
+
+            <span data-i18n="version">Version</span>
+            <strong>1.0.0</strong>
+
+            <span data-i18n="mapEngine">Map Engine</span>
+            <strong>Leaflet</strong>
+        </div>
+
+    </aside>
+
+
+    <!-- MAP AREA -->
+    <section class="map-container">
+
+        <div class="map-heading">
+            <div>
+                <h2 data-i18n="worldMap">World Map</h2>
+                <p data-i18n="mapDescription">
+                    Interactive geographic visualization
+                </p>
+            </div>
+
+            <div class="map-badge">2D GIS</div>
+        </div>
+
+        <!-- LOCATION SEARCH -->
+        <form id="searchForm" class="search-bar">
+            <input
+                id="searchInput"
+                type="search"
+                data-i18n-placeholder="searchPlaceholder"
+                placeholder="Search for a place..."
+                autocomplete="off"
+            >
+
+            <button id="searchButton" type="submit"
+                data-i18n="searchButton">
+                Search
+            </button>
+        </form>
+
+        <div id="searchMessage" class="search-message"
+            aria-live="polite"></div>
+
+        <div id="searchResults" class="search-results"></div>
+
+        <div id="map"></div>
+
+        <div class="map-footer">
+            <span id="mapSource">© OpenStreetMap</span>
+            <span id="mapStatus" data-i18n="mapReady">Map is ready</span>
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="bottom-bar">
+    <div>GEONATIVE EXPLORER</div>
+    <div id="coordinates">Lat: -- | Lon: --</div>
+    <div data-i18n="footerText">Interactive Web GIS</div>
+</footer>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
